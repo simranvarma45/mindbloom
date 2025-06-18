@@ -1,0 +1,73 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+
+export default function Login() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleChange = (e) =>
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message);
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userName", data.user.name); // ✅ save name
+
+      // ✅ Toast message before redirect
+      toast.success(`Hi ${data.user.name}, welcome to MindBloom 🌸`, {
+        duration: 3000,
+      });
+
+      setTimeout(() => {
+        navigate("/"); // Redirect after 3s
+      }, 3000);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow">
+      <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="email"
+          name="email"
+          placeholder="Email"
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+          required
+        />
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          onChange={handleChange}
+          className="w-full border px-3 py-2 rounded"
+          required
+        />
+        {error && <p className="text-red-600 text-sm">{error}</p>}
+        <button
+          type="submit"
+          className="w-full bg-softBrown text-white py-2 rounded hover:bg-rose-400"
+        >
+          Login
+        </button>
+      </form>
+    </div>
+  );
+}

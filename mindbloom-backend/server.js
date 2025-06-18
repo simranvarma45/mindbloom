@@ -7,6 +7,7 @@ const activityRoutes = require('./routes/activityRoutes');
 const reflectionRoutes = require('./routes/reflectionRoutes');
 const emotionRoutes = require('./routes/emotionRoutes');
 
+const authRoutes = require('./routes/authRoutes');
 
 
 
@@ -24,7 +25,7 @@ app.use('/api/vision', visionRoutes);
 app.use('/api/activities', activityRoutes); 
 app.use('/api/reflections', reflectionRoutes);
 app.use('/api/emotions', emotionRoutes);
-
+app.use('/api/auth', authRoutes);
 
 
 

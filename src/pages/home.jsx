@@ -9,7 +9,7 @@ export default function Home() {
       <BackgroundBlobs />
 
       <h2 className="text-4xl md:text-5xl font-serif font-semibold text-earthText mb-6 z-10">
-        Welcome, Simran 🌸
+        Welcome to Peace 🌸
       </h2>
 
       <p className="text-lg md:text-xl italic text-softBrown max-w-xl mb-8 z-10">

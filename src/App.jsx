@@ -30,11 +30,11 @@ function App() {
             <Route path="/signup" element={<Signup />} />
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<Home />} />
-            <Route path="/vision-board" element={<VisionBoard />} />
+            <Route path="/vision-board" element={ <VisionBoard />} />
             <Route path="/me-time" element={<MeTime />} />
             <Route path="/heal-hub" element={<HealHub />} />
-            <Route path="/me-time/mood" element={<MoodPage />} />
-            <Route path="/me-time/activities" element={<ActivitiesPage />} />
+            <Route path="/me-time/mood" element={  <MoodPage />} />
+            <Route path="/me-time/activities" element={<ActivitiesPage />}/>
             <Route path="/me-time/timer" element={<TimerPage />} />
             <Route path="/me-time/reflection" element={<ReflectionLog />} />
             <Route path="/healhub/emotion-journal" element={<EmotionJournalPage />} />

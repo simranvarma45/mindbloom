@@ -1,7 +1,18 @@
 const BASE_URL = 'http://localhost:5000/api/vision'; // Update if hosted
 
+// Utility to get token
+const getAuthHeaders = () => {
+  const token = localStorage.getItem("token");
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
+};
+
 export const fetchVisions = async () => {
-  const res = await fetch(BASE_URL);
+  const res = await fetch(BASE_URL, {
+    headers: getAuthHeaders(),
+  });
   if (!res.ok) throw new Error("Failed to fetch visions");
   return await res.json();
 };
@@ -9,22 +20,21 @@ export const fetchVisions = async () => {
 export const addVision = async ({ title, image, achieved }) => {
   const res = await fetch(BASE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({ title, image, achieved }),
   });
   if (!res.ok) throw new Error("Failed to add vision");
   return await res.json();
 };
 
-
 export const updateVision = async (id, updates) => {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: getAuthHeaders(),
     body: JSON.stringify({
       ...(updates.title && { title: updates.title }),
       ...(typeof updates.achieved === "boolean" && { achieved: updates.achieved }),
-      ...(updates.image && { image: updates.image })  // ✅ add this line
+      ...(updates.image && { image: updates.image }),
     }),
   });
 
@@ -32,10 +42,10 @@ export const updateVision = async (id, updates) => {
   return await res.json();
 };
 
-
 export const deleteVision = async (id) => {
   const res = await fetch(`${BASE_URL}/${id}`, {
     method: 'DELETE',
+    headers: getAuthHeaders(),
   });
   if (!res.ok) throw new Error("Failed to delete vision");
   return await res.json();

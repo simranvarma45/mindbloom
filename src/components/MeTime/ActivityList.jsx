@@ -5,11 +5,25 @@ export default function ActivityList() {
   const [activities, setActivities] = useState([]);
   const [title, setTitle] = useState("");
   const [editingId, setEditingId] = useState(null);
+  const token = localStorage.getItem("token");
 
   const fetchActivities = async () => {
-    const res = await fetch("http://localhost:5000/api/activities");
-    const data = await res.json();
-    setActivities(data);
+    if (!token) {
+      toast.error("Please login to view your activities.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/activities", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setActivities(data);
+    } catch (err) {
+      console.error("Error fetching activities:", err);
+    }
   };
 
   useEffect(() => {
@@ -17,42 +31,69 @@ export default function ActivityList() {
   }, []);
 
   const handleAddOrUpdate = async () => {
-    if (!title.trim()) return;
-
-    if (editingId) {
-      // Update
-      const res = await fetch(`http://localhost:5000/api/activities/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
-      });
-      const data = await res.json();
-      setActivities((prev) =>
-        prev.map((item) => (item._id === editingId ? data : item))
-      );
-      toast.success("Activity updated");
-    } else {
-      // Add
-      const res = await fetch("http://localhost:5000/api/activities", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title }),
-      });
-      const data = await res.json();
-      setActivities([data, ...activities]);
-      toast.success("Activity added");
+    if (!token) {
+      toast.error("Please login to manage your activities.");
+      return;
     }
 
-    setTitle("");
-    setEditingId(null);
+    if (!title.trim()) return;
+
+    try {
+      if (editingId) {
+        const res = await fetch(`http://localhost:5000/api/activities/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title }),
+        });
+        const data = await res.json();
+        setActivities((prev) =>
+          prev.map((item) => (item._id === editingId ? data : item))
+        );
+        toast.success("Activity updated");
+      } else {
+        const res = await fetch("http://localhost:5000/api/activities", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ title }),
+        });
+        const data = await res.json();
+        setActivities([data, ...activities]);
+        toast.success("Activity added");
+      }
+
+      setTitle("");
+      setEditingId(null);
+    } catch (err) {
+      console.error("Error saving activity:", err);
+      toast.error("Something went wrong");
+    }
   };
 
   const handleDelete = async (id) => {
-    await fetch(`http://localhost:5000/api/activities/${id}`, {
-      method: "DELETE",
-    });
-    setActivities(activities.filter((item) => item._id !== id));
-    toast.success("Activity deleted");
+    if (!token) {
+      toast.error("Please login to delete your activity.");
+      return;
+    }
+
+    try {
+      await fetch(`http://localhost:5000/api/activities/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setActivities(activities.filter((item) => item._id !== id));
+      toast.success("Activity deleted");
+    } catch (err) {
+      console.error("Error deleting activity:", err);
+      toast.error("Failed to delete activity");
+    }
   };
 
   const handleEdit = (activity) => {

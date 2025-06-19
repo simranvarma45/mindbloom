@@ -1,45 +1,69 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function ReflectionLog() {
   const [reflection, setReflection] = useState("");
   const [reflections, setReflections] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const token = localStorage.getItem("token");
 
-  // Fetch all reflections
   useEffect(() => {
     fetchReflections();
   }, []);
 
   const fetchReflections = async () => {
-    const res = await fetch("/api/reflections");
-    const data = await res.json();
-    setReflections(data);
+    if (!token) {
+      toast.error("Please login to view your reflections.");
+      return;
+    }
+
+    try {
+      const res = await fetch("http://localhost:5000/api/reflections", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const data = await res.json();
+      setReflections(data);
+    } catch (err) {
+      console.error("Error fetching reflections:", err);
+    }
   };
 
   const handleSave = async () => {
-    if (!reflection.trim()) return;
-
-    if (editingId) {
-      // Update existing reflection
-      const res = await fetch(`/api/reflections/${editingId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: reflection }),
-      });
-      await res.json();
-      setEditingId(null);
-    } else {
-      // Create new reflection
-      const res = await fetch("/api/reflections", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content: reflection }),
-      });
-      await res.json();
+    if (!token) {
+      toast.error("Please login to save your reflection.");
+      return;
     }
 
-    setReflection("");
-    fetchReflections();
+    if (!reflection.trim()) return;
+
+    try {
+      if (editingId) {
+        await fetch(`http://localhost:5000/api/reflections/${editingId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: reflection }),
+        });
+        setEditingId(null);
+      } else {
+        await fetch("http://localhost:5000/api/reflections", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ content: reflection }),
+        });
+      }
+      setReflection("");
+      fetchReflections();
+    } catch (err) {
+      console.error("Error saving reflection:", err);
+    }
   };
 
   const handleEdit = (id, content) => {
@@ -48,10 +72,22 @@ export default function ReflectionLog() {
   };
 
   const handleDelete = async (id) => {
-    await fetch(`/api/reflections/${id}`, {
-      method: "DELETE",
-    });
-    fetchReflections();
+    if (!token) {
+      toast.error("Please login to delete your reflection.");
+      return;
+    }
+
+    try {
+      await fetch(`http://localhost:5000/api/reflections/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      fetchReflections();
+    } catch (err) {
+      console.error("Error deleting reflection:", err);
+    }
   };
 
   return (
@@ -80,7 +116,9 @@ export default function ReflectionLog() {
             key={r._id}
             className="p-4 bg-softCream rounded-md border border-gray-200 shadow-inner"
           >
-            <p className="text-sm text-gray-700">💭 {new Date(r.createdAt).toLocaleString()}</p>
+            <p className="text-sm text-gray-700">
+              💭 {new Date(r.createdAt).toLocaleString()}
+            </p>
             <p className="text-base mt-1">{r.content}</p>
             <div className="mt-2 flex gap-2">
               <button

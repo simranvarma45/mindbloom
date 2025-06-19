@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 export default function EmotionJournal() {
   const [entries, setEntries] = useState([]);
   const [text, setText] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
+
+  const token = localStorage.getItem("token");
 
   const formatDate = () => {
     const date = new Date();
@@ -15,12 +18,20 @@ export default function EmotionJournal() {
     });
   };
 
-  // Fetch all emotion entries from the backend
   const fetchEntries = async () => {
+    if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/api/emotions");
+      const res = await fetch("http://localhost:5000/api/emotions", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await res.json();
-      setEntries(data.reverse());
+      if (Array.isArray(data)) {
+        setEntries(data.reverse());
+      } else {
+        console.error("Unexpected response:", data);
+      }
     } catch (err) {
       console.error("Failed to fetch emotions:", err);
     }
@@ -31,14 +42,21 @@ export default function EmotionJournal() {
   }, []);
 
   const handleSubmit = async () => {
+    if (!token) {
+      toast.error("Please login to add an entry");
+      return;
+    }
+
     if (text.trim() === "") return;
 
-    if (isEditing) {
-      // Update entry
-      try {
+    try {
+      if (isEditing) {
         const res = await fetch(`http://localhost:5000/api/emotions/${editId}`, {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ text }),
         });
         const updated = await res.json();
@@ -47,22 +65,24 @@ export default function EmotionJournal() {
         );
         setIsEditing(false);
         setEditId(null);
-      } catch (err) {
-        console.error("Error updating emotion:", err);
-      }
-    } else {
-      // Create new entry
-      try {
+      } else {
         const res = await fetch("http://localhost:5000/api/emotions", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify({ text, date: formatDate() }),
         });
-        const newEntry = await res.json();
-        setEntries([newEntry, ...entries]);
-      } catch (err) {
-        console.error("Error adding emotion:", err);
+        if (res.status === 201) {
+          fetchEntries(); // refresh list after adding
+        } else {
+          const data = await res.json();
+          toast.error(data.message || "Failed to add entry");
+        }
       }
+    } catch (err) {
+      console.error("Error saving emotion:", err);
     }
 
     setText("");
@@ -75,11 +95,25 @@ export default function EmotionJournal() {
   };
 
   const handleDelete = async (id) => {
+    if (!token) {
+      toast.error("Please login to delete an entry");
+      return;
+    }
+
     try {
-      await fetch(`http://localhost:5000/api/emotions/${id}`, {
+      const res = await fetch(`http://localhost:5000/api/emotions/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setEntries(entries.filter((entry) => entry._id !== id));
+
+      if (res.ok) {
+        fetchEntries(); // refresh after deletion
+      } else {
+        const data = await res.json();
+        toast.error(data.message || "Failed to delete");
+      }
     } catch (err) {
       console.error("Error deleting emotion:", err);
     }
@@ -106,16 +140,26 @@ export default function EmotionJournal() {
       </div>
 
       <ul className="space-y-2">
-        {entries.map((entry) => (
-          <li key={entry._id} className="bg-softCream px-4 py-2 rounded-md">
+        {entries.map((entry, index) => (
+          <li key={entry._id || index} className="bg-softCream px-4 py-2 rounded-md">
             <div className="flex justify-between items-center">
               <div>
                 <p className="font-medium text-earthText">{entry.text}</p>
                 <p className="text-sm text-gray-500">{entry.date}</p>
               </div>
               <div className="flex gap-2">
-                <button onClick={() => handleEdit(entry)} className="text-blue-500 hover:text-blue-700 text-sm">✏️</button>
-                <button onClick={() => handleDelete(entry._id)} className="text-red-500 hover:text-red-700 text-sm">❌</button>
+                <button
+                  onClick={() => handleEdit(entry)}
+                  className="text-blue-500 hover:text-blue-700 text-sm"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={() => handleDelete(entry._id)}
+                  className="text-red-500 hover:text-red-700 text-sm"
+                >
+                  ❌
+                </button>
               </div>
             </div>
           </li>

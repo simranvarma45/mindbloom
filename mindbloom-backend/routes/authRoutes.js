@@ -4,7 +4,10 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret123";
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is missing from environment variables.");
+}
 
 // Signup
 router.post("/signup", async (req, res) => {

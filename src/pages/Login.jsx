@@ -25,16 +25,20 @@ export default function Login() {
       if (!res.ok) throw new Error(data.message);
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userName", data.user.name); // ✅ save name
+      localStorage.setItem("userName", data.user.name); // save name
+      window.dispatchEvent(new Event("authChanged")); // tells Navbar to re-check
 
       // ✅ Toast message before redirect
-      toast.success(`Hi ${data.user.name}, welcome to MindBloom 🌸`, {
-        duration: 3000,
+      toast.success(`Welcome back , ${data.user.name} 🌸`, {
+        duration: 1500,
       });
 
+      const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
+      localStorage.removeItem("redirectAfterLogin");
+
       setTimeout(() => {
-        navigate("/"); // Redirect after 3s
-      }, 3000);
+        navigate(redirectTo); // Redirect after 3s
+      }, 1500);
     } catch (err) {
       setError(err.message);
     }

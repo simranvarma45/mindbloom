@@ -1,10 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 
+
 export default function MeTimeTimer() {
   const [minutes, setMinutes] = useState(5);
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const timerRef = useRef(null);
+  const audioRef = useRef(new Audio("/assets/audio/timer-end.mp3"));
+
 
   // Timer countdown logic
   useEffect(() => {
@@ -14,6 +17,7 @@ export default function MeTimeTimer() {
           if (prevSec === 0) {
             if (minutes === 0) {
               clearInterval(timerRef.current);
+              audioRef.current.play();
               return 0;
             }
             setMinutes((m) => m - 1);

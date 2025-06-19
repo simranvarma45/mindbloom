@@ -1,3 +1,4 @@
+const token = localStorage.getItem("token");
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { uploadImage } from "../utils/uploadImage";
@@ -15,6 +16,11 @@ export default function VisionBoard() {
   const [editIndex, setEditIndex] = useState(null); // null = add, number = edit mode
 
   useEffect(() => {
+    if (!token) {
+      toast.error("Please login to access your VisionBoard 🌱");
+      return;
+    }
+
     const loadData = async () => {
       try {
         const data = await fetchVisions();
@@ -24,28 +30,25 @@ export default function VisionBoard() {
         console.error(err);
       }
     };
+
     loadData();
   }, []);
 
-  // const handleImageUpload = (e) => {
-  //   const file = e.target.files[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setNewVision({ ...newVision, image: reader.result });
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
+
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (file) {
       const imageUrl = await uploadImage(file);
-    setNewVision((prev) => ({ ...prev, image: imageUrl }));
+      setNewVision((prev) => ({ ...prev, image: imageUrl }));
     }
   };
 
   const handleSaveVision = async () => {
+    if (!token) {
+      toast.error("Login required to perform this action");
+      return;
+    }
+
     if (!newVision.title.trim()) {
       toast.error("Title is required");
       return;
@@ -100,6 +103,11 @@ export default function VisionBoard() {
   };
 
   const handleDelete = async (index) => {
+    if (!token) {
+      toast.error("Login required to perform this action");
+      return;
+    }
+
     const confirmDelete = window.confirm("Are you sure you want to delete this vision?");
     if (!confirmDelete) return;
 
@@ -116,6 +124,11 @@ export default function VisionBoard() {
   };
 
   const toggleAchieved = async (index) => {
+    if (!token) {
+      toast.error("Login required to perform this action");
+      return;
+    }
+
     try {
       const item = visionItems[index];
       const updated = await updateVision(item._id, {
@@ -137,13 +150,13 @@ export default function VisionBoard() {
   };
 
   const handleEdit = (index) => {
-  setNewVision({
-    title: visionItems[index].title,
-    image: visionItems[index].image || "", // set image properly here
-  });
-  setEditIndex(index);
-  setIsModalOpen(true);
-};
+    setNewVision({
+      title: visionItems[index].title,
+      image: visionItems[index].image || "", // set image properly here
+    });
+    setEditIndex(index);
+    setIsModalOpen(true);
+  };
 
 
   const defaultImage =

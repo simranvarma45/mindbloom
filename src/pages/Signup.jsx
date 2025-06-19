@@ -26,15 +26,19 @@ export default function Signup() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.user.name);
+      window.dispatchEvent(new Event("authChanged")); //tells Navbar to re-check
 
       // ✅ Toast message before redirect
       toast.success(`Hi ${data.user.name}, welcome to MindBloom 🌸`, {
-        duration: 3000,
+        duration: 1500,
       });
 
+      const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
+      localStorage.removeItem("redirectAfterLogin");
+
       setTimeout(() => {
-        navigate("/");
-      }, 3000);
+        navigate(redirectTo);
+      }, 1500);
     } catch (err) {
       setError(err.message);
     }

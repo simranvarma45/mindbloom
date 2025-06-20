@@ -1,14 +1,15 @@
 {
-  "name": "backend",
+  "name": "mindbloom-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",               // ✅ change from index.js to server.js
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",       // ✅ required for Render
+    "dev": "nodemon server.js"       // optional for local development
   },
   "keywords": [],
-  "author": "",
+  "author": "Simran",
   "license": "ISC",
-  "description": "",
+  "description": "MindBloom backend server",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",

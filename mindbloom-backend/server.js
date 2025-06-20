@@ -9,6 +9,7 @@ const activityRoutes = require('./routes/activityRoutes');
 const reflectionRoutes = require('./routes/reflectionRoutes');
 const emotionRoutes = require('./routes/emotionRoutes');
 const authRoutes = require('./routes/authRoutes');
+const affirmationRoutes = require("./routes/affirmationRoutes");
 
 connectDB();               // ✅ Connect to MongoDB
 
@@ -27,6 +28,7 @@ app.use('/api/activities', activityRoutes);
 app.use('/api/reflections', reflectionRoutes);
 app.use('/api/emotions', emotionRoutes);
 app.use('/api/auth', authRoutes);
+app.use("/api/affirmations", affirmationRoutes);
 
 
 

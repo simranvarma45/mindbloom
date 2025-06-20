@@ -25,19 +25,19 @@ export default function Login() {
       if (!res.ok) throw new Error(data.message);
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("userName", data.user.name); // save name
-      window.dispatchEvent(new Event("authChanged")); // tells Navbar to re-check
+      localStorage.setItem("userName", data.user.name);
+      window.dispatchEvent(new Event("authChanged"));
 
-      // ✅ Toast message before redirect
-      toast.success(`Welcome back , ${data.user.name} 🌸`, {
+      toast.success(`Welcome back, ${data.user.name} 🌸`, {
         duration: 1500,
       });
 
+      // ✅ Redirect to last visited page or home
       const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
       localStorage.removeItem("redirectAfterLogin");
 
       setTimeout(() => {
-        navigate(redirectTo); // Redirect after 3s
+        navigate(redirectTo);
       }, 1500);
     } catch (err) {
       setError(err.message);

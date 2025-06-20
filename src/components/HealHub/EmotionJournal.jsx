@@ -29,8 +29,6 @@ export default function EmotionJournal() {
       const data = await res.json();
       if (Array.isArray(data)) {
         setEntries(data.reverse());
-      } else {
-        console.error("Unexpected response:", data);
       }
     } catch (err) {
       console.error("Failed to fetch emotions:", err);
@@ -42,11 +40,7 @@ export default function EmotionJournal() {
   }, []);
 
   const handleSubmit = async () => {
-    if (!token) {
-      toast.error("Please login to add an entry");
-      return;
-    }
-
+    if (!token) return toast.error("Please login to add an entry");
     if (text.trim() === "") return;
 
     try {
@@ -63,6 +57,7 @@ export default function EmotionJournal() {
         setEntries((prev) =>
           prev.map((entry) => (entry._id === editId ? updated : entry))
         );
+        toast.success("Entry updated");
         setIsEditing(false);
         setEditId(null);
       } else {
@@ -75,10 +70,8 @@ export default function EmotionJournal() {
           body: JSON.stringify({ text, date: formatDate() }),
         });
         if (res.status === 201) {
-          fetchEntries(); // refresh list after adding
-        } else {
-          const data = await res.json();
-          toast.error(data.message || "Failed to add entry");
+          fetchEntries();
+          toast.success("Entry added 💖");
         }
       }
     } catch (err) {
@@ -95,10 +88,7 @@ export default function EmotionJournal() {
   };
 
   const handleDelete = async (id) => {
-    if (!token) {
-      toast.error("Please login to delete an entry");
-      return;
-    }
+    if (!token) return toast.error("Please login to delete an entry");
 
     try {
       const res = await fetch(`http://localhost:5000/api/emotions/${id}`, {
@@ -109,10 +99,8 @@ export default function EmotionJournal() {
       });
 
       if (res.ok) {
-        fetchEntries(); // refresh after deletion
-      } else {
-        const data = await res.json();
-        toast.error(data.message || "Failed to delete");
+        fetchEntries();
+        toast.success("Entry deleted");
       }
     } catch (err) {
       console.error("Error deleting emotion:", err);
@@ -120,51 +108,62 @@ export default function EmotionJournal() {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 w-full max-w-md">
-      <h2 className="text-xl font-semibold mb-4 text-center">Emotion/Gratitude Journal</h2>
+    <div className="min-h-screen bg-gradient-to-b from-rose-50 to-amber-50 py-12 px-4">
+      <div className="max-w-2xl mx-auto bg-white shadow-lg rounded-2xl p-6">
+        <h2 className="text-2xl font-semibold text-center text-softBrown mb-6">
+          🌿 Emotion / Gratitude Journal
+        </h2>
 
-      <div className="flex gap-2 mb-4">
-        <input
-          type="text"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Write your thoughts..."
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-        />
-        <button
-          onClick={handleSubmit}
-          className="bg-softBrown text-white px-4 py-2 rounded-md hover:bg-rose-400 transition"
-        >
-          {isEditing ? "Update" : "Add"}
-        </button>
-      </div>
+        <div className="flex flex-col sm:flex-row gap-2 mb-6">
+          <input
+            type="text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Today I feel grateful for..."
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+          />
+          <button
+            onClick={handleSubmit}
+            className="bg-softBrown hover:bg-rose-400 text-white px-5 py-2 rounded-lg shadow transition"
+          >
+            {isEditing ? "Update" : "Add"}
+          </button>
+        </div>
 
-      <ul className="space-y-2">
-        {entries.map((entry, index) => (
-          <li key={entry._id || index} className="bg-softCream px-4 py-2 rounded-md">
-            <div className="flex justify-between items-center">
+        {entries.length === 0 && (
+          <p className="text-gray-500 text-center italic">
+            No journal entries yet.
+          </p>
+        )}
+
+        <ul className="space-y-3">
+          {entries.map((entry, index) => (
+            <li
+              key={entry._id || index}
+              className="bg-softCream px-5 py-4 rounded-xl shadow-sm border border-rose-100 flex justify-between items-start"
+            >
               <div>
-                <p className="font-medium text-earthText">{entry.text}</p>
-                <p className="text-sm text-gray-500">{entry.date}</p>
+                <p className="text-softBrown font-medium">{entry.text}</p>
+                <p className="text-sm text-gray-500 mt-1">{entry.date}</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row items-center gap-2">
                 <button
                   onClick={() => handleEdit(entry)}
                   className="text-blue-500 hover:text-blue-700 text-sm"
                 >
-                  ✏️
+                  ✏️ Edit
                 </button>
                 <button
                   onClick={() => handleDelete(entry._id)}
                   className="text-red-500 hover:text-red-700 text-sm"
                 >
-                  ❌
+                  ❌ Delete
                 </button>
               </div>
-            </div>
-          </li>
-        ))}
-      </ul>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

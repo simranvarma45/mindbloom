@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { BASE_URL } from "../../config";
 
 export default function EmotionJournal() {
   const [entries, setEntries] = useState([]);
@@ -21,7 +22,7 @@ export default function EmotionJournal() {
   const fetchEntries = async () => {
     if (!token) return;
     try {
-      const res = await fetch("http://localhost:5000/api/emotions", {
+      const res = await fetch(`${BASE_URL}/api/emotions`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,7 +38,7 @@ export default function EmotionJournal() {
 
   useEffect(() => {
     fetchEntries();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async () => {
     if (!token) return toast.error("Please login to add an entry");
@@ -45,7 +46,7 @@ export default function EmotionJournal() {
 
     try {
       if (isEditing) {
-        const res = await fetch(`http://localhost:5000/api/emotions/${editId}`, {
+        const res = await fetch(`${BASE_URL}/api/emotions/${editId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -61,7 +62,7 @@ export default function EmotionJournal() {
         setIsEditing(false);
         setEditId(null);
       } else {
-        const res = await fetch("http://localhost:5000/api/emotions", {
+        const res = await fetch(`${BASE_URL}/api/emotions`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -91,7 +92,7 @@ export default function EmotionJournal() {
     if (!token) return toast.error("Please login to delete an entry");
 
     try {
-      const res = await fetch(`http://localhost:5000/api/emotions/${id}`, {
+      const res = await fetch(`${BASE_URL}/api/emotions/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

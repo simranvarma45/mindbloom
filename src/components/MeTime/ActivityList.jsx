@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { FaEdit, FaTrashAlt, FaPlusCircle, FaSave } from "react-icons/fa";
+import { BASE_URL } from "../../config";
 
 export default function ActivityList() {
   const [activities, setActivities] = useState([]);
@@ -18,7 +19,7 @@ export default function ActivityList() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/activities", {
+      const res = await fetch(`${BASE_URL}/api/activities`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -42,7 +43,7 @@ export default function ActivityList() {
 
     try {
       if (editingId) {
-        const res = await fetch(`http://localhost:5000/api/activities/${editingId}`, {
+        const res = await fetch(`${BASE_URL}/api/activities/${editingId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -56,7 +57,7 @@ export default function ActivityList() {
         );
         toast.success("Activity updated");
       } else {
-        const res = await fetch("http://localhost:5000/api/activities", {
+        const res = await fetch(`${BASE_URL}/api/activities`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -89,7 +90,7 @@ export default function ActivityList() {
     }
 
     try {
-      await fetch(`http://localhost:5000/api/activities/${id}`, {
+      await fetch(`${BASE_URL}/api/activities/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

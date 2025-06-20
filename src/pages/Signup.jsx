@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast"; // ✅ Add this!
+import toast from "react-hot-toast"; 
+import { BASE_URL } from "../config";
 
 export default function Signup() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -15,7 +16,7 @@ export default function Signup() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/auth/signup", {
+      const res = await fetch(`${BASE_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

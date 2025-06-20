@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
+import { BASE_URL } from "../../config";
 
 export default function ReflectionLog() {
   const [reflection, setReflection] = useState("");
@@ -18,7 +19,7 @@ export default function ReflectionLog() {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/reflections", {
+      const res = await fetch(`${BASE_URL}/api/reflections`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -40,7 +41,7 @@ export default function ReflectionLog() {
 
     try {
       if (editingId) {
-        await fetch(`http://localhost:5000/api/reflections/${editingId}`, {
+        await fetch(`${BASE_URL}/api/reflections/${editingId}`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
@@ -50,7 +51,7 @@ export default function ReflectionLog() {
         });
         setEditingId(null);
       } else {
-        await fetch("http://localhost:5000/api/reflections", {
+        await fetch(`${BASE_URL}/api/reflections`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -78,7 +79,7 @@ export default function ReflectionLog() {
     }
 
     try {
-      await fetch(`http://localhost:5000/api/reflections/${id}`, {
+      await fetch(`${BASE_URL}/api/reflections/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

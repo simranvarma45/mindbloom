@@ -5,9 +5,10 @@ import toast from "react-hot-toast";
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const location = useLocation(); // ✅ Get current page path
+  const location = useLocation();
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
 
+  // Listen for login/logout auth changes
   useEffect(() => {
     const checkAuth = () => setLoggedIn(isLoggedIn());
     checkAuth();
@@ -15,27 +16,21 @@ export default function Navbar() {
     return () => window.removeEventListener("authChanged", checkAuth);
   }, []);
 
+  const handleRedirect = (path) => {
+    localStorage.setItem("redirectAfterLogin", location.pathname);
+    navigate(path);
+  };
+
   const handleLogout = () => {
     logoutUser();
     setLoggedIn(false);
     toast.success("You’ve been logged out 🌱");
-  };
-
-  const handleLoginClick = () => {
-    localStorage.setItem("redirectAfterLogin", location.pathname); // ✅ Store current path
-    navigate("/login");
-  };
-
-  const handleSignupClick = () => {
-    localStorage.setItem("redirectAfterLogin", location.pathname); // ✅ Store current path
-    navigate("/signup");
+    navigate("/"); // Redirect to home
   };
 
   return (
     <nav className="bg-lightPeach py-4 px-6 shadow-md rounded-b-2xl relative flex items-center justify-center">
-      <h1 className="text-2xl font-serif font-bold text-green-900">
-        MindBloom
-      </h1>
+      <h1 className="text-2xl font-serif font-bold text-green-900">MindBloom</h1>
 
       <div className="absolute right-6 top-1/2 transform -translate-y-1/2 flex gap-3">
         {loggedIn ? (
@@ -48,28 +43,20 @@ export default function Navbar() {
         ) : (
           <>
             <button
-              onClick={() => {
-                localStorage.setItem("redirectAfterLogin", window.location.pathname);
-                navigate("/login");
-              }}
+              onClick={() => handleRedirect("/login")}
               className="text-blue-600 hover:text-blue-800 text-sm"
             >
               Login
             </button>
             <button
-              onClick={() => {
-                localStorage.setItem("redirectAfterLogin", window.location.pathname);
-                navigate("/signup");
-              }}
+              onClick={() => handleRedirect("/signup")}
               className="text-green-700 hover:text-green-900 text-sm"
             >
               Signup
             </button>
-
           </>
         )}
       </div>
-
     </nav>
   );
 }

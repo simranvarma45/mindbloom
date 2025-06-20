@@ -1,35 +1,41 @@
-const BASE_URL = 'http://localhost:5000/api/vision'; // Update if hosted
+import { BASE_URL } from "../config"; 
 
-// Utility to get token
+const VISION_URL = `${BASE_URL}/api/vision`;
+
+// Utility to get token and construct headers
 const getAuthHeaders = () => {
   const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found. Please log in.");
   return {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     Authorization: `Bearer ${token}`,
   };
 };
 
+// Fetch all visions for the logged-in user
 export const fetchVisions = async () => {
-  const res = await fetch(BASE_URL, {
+  const res = await fetch(VISION_URL, {
     headers: getAuthHeaders(),
   });
-  if (!res.ok) throw new Error("Failed to fetch visions");
+  if (!res.ok) throw new Error(`Fetch error: ${res.statusText}`);
   return await res.json();
 };
 
+// Add a new vision
 export const addVision = async ({ title, image, achieved }) => {
-  const res = await fetch(BASE_URL, {
-    method: 'POST',
+  const res = await fetch(VISION_URL, {
+    method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ title, image, achieved }),
   });
-  if (!res.ok) throw new Error("Failed to add vision");
+  if (!res.ok) throw new Error(`Add error: ${res.statusText}`);
   return await res.json();
 };
 
+// Update an existing vision
 export const updateVision = async (id, updates) => {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: 'PUT',
+  const res = await fetch(`${VISION_URL}/${id}`, {
+    method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify({
       ...(updates.title && { title: updates.title }),
@@ -38,15 +44,16 @@ export const updateVision = async (id, updates) => {
     }),
   });
 
-  if (!res.ok) throw new Error("Failed to update vision");
+  if (!res.ok) throw new Error(`Update error: ${res.statusText}`);
   return await res.json();
 };
 
+// Delete a vision
 export const deleteVision = async (id) => {
-  const res = await fetch(`${BASE_URL}/${id}`, {
-    method: 'DELETE',
+  const res = await fetch(`${VISION_URL}/${id}`, {
+    method: "DELETE",
     headers: getAuthHeaders(),
   });
-  if (!res.ok) throw new Error("Failed to delete vision");
+  if (!res.ok) throw new Error(`Delete error: ${res.statusText}`);
   return await res.json();
 };

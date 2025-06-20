@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { BASE_URL } from "../config";
@@ -7,6 +7,15 @@ export default function Login() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // 👇 If already logged in, redirect to home or intended page
+    const token = localStorage.getItem("token");
+    if (token) {
+      const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
+      navigate(redirectTo, { replace: true });
+    }
+  }, [navigate]);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -33,7 +42,6 @@ export default function Login() {
         duration: 1500,
       });
 
-      // ✅ Redirect to last visited page or home
       const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
       localStorage.removeItem("redirectAfterLogin");
 

@@ -1,12 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import toast from "react-hot-toast"; 
+import toast from "react-hot-toast";
 import { BASE_URL } from "../config";
 
 export default function Signup() {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  // 👇 Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      const redirectTo = localStorage.getItem("redirectAfterLogin") || "/";
+      navigate(redirectTo, { replace: true });
+    }
+  }, [navigate]);
 
   const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -27,9 +36,8 @@ export default function Signup() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("userName", data.user.name);
-      window.dispatchEvent(new Event("authChanged")); //tells Navbar to re-check
+      window.dispatchEvent(new Event("authChanged")); // tells Navbar to re-check auth
 
-      // ✅ Toast message before redirect
       toast.success(`Hi ${data.user.name}, welcome to MindBloom 🌸`, {
         duration: 1500,
       });

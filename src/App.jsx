@@ -10,7 +10,7 @@ import ActivitiesPage from "./pages/MeTime/ActivitiesPage";
 import TimerPage from "./pages/MeTime/TimerPage";
 import ReflectionLog from "./components/MeTime/ReflectionLog";
 import BreathingPage from "./pages/HealHub/BreathingPage";
-import EmotionJournalPage from "./pages/HealHub/EmotionJournalpage";
+import EmotionJournalPage from "./pages/HealHub/EmotionJournalPage";
 import HealHub from "./pages/HealHub/HealHub";
 import MeditationAudio from "./components/HealHub/MeditationAudio";
 import PositiveAffirmations from "./components/HealHub/Affirmations";

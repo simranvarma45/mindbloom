@@ -1,7 +1,7 @@
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import { Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
+import Home from "./pages/home";
 import VisionBoard from "./pages/VisionBoard";
 import MeTime from "./pages/MeTime/metime";
 import { Toaster } from "react-hot-toast";

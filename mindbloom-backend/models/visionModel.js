@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const visionSchema = new mongoose.Schema({
   title: {
@@ -7,7 +7,7 @@ const visionSchema = new mongoose.Schema({
   },
   image: {
     type: String,
-    default: '',
+    default: "",
   },
   achieved: {
     type: Boolean,
@@ -15,9 +15,9 @@ const visionSchema = new mongoose.Schema({
   },
    userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true, 
     },
 }, { timestamps: true });
 
-module.exports = mongoose.model('VisionItem', visionSchema);
+module.exports = mongoose.model("VisionItem", visionSchema);

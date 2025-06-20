@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const activitySchema = new mongoose.Schema(
   {
@@ -8,7 +8,7 @@ const activitySchema = new mongoose.Schema(
     },
      userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "User",
       required: true, 
     },
   },
@@ -16,4 +16,4 @@ const activitySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model('Activity', activitySchema);
+module.exports = mongoose.model("Activity", activitySchema);

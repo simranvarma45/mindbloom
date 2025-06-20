@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const emotionSchema = new mongoose.Schema({
   text: {
@@ -11,9 +11,9 @@ const emotionSchema = new mongoose.Schema({
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true, 
   },
 });
 
-module.exports = mongoose.model('Emotion', emotionSchema);
+module.exports = mongoose.model("Emotion", emotionSchema);
